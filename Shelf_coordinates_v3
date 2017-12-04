@@ -1,0 +1,146 @@
+goal: 
+
+      position: 
+        x: -0.0106398761272
+        y: 0.375935912132
+        z: 0.0
+      orientation: 
+        x: 0.0
+        y: 0.0
+        z: 0.713531741909
+        w: 0.700622903771
+---
+
+  target_pose: 
+    header: 
+      seq: 7
+      stamp: 
+        secs: 1512037388
+        nsecs: 668890480
+      frame_id: map
+    pose: 
+      position: 
+        x: 0.990336298943
+        y: 0.381471037865
+        z: 0.0
+      orientation: 
+        x: 0.0
+        y: 0.0
+        z: 0.7073419113
+        w: 0.706871572861
+---
+h
+  target_pose: 
+    header: 
+      seq: 8
+      stamp: 
+        secs: 1512037399
+        nsecs:  69627541
+      frame_id: map
+    pose: 
+      position: 
+        x: 0.00168535113335
+        y: -2.46735405922
+        z: 0.0
+      orientation: 
+        x: 0.0
+        y: 0.0
+        z: -0.696203777866
+        w: 0.717844202933
+
+  target_pose: 
+    header: 
+      seq: 9
+      stamp: 
+        secs: 1512037407
+        nsecs: 454877950
+      frame_id: map
+    pose: 
+      position: 
+        x: 0.938663363457
+        y: -2.4582092762
+        z: 0.0
+      orientation: 
+        x: 0.0
+        y: 0.0
+        z: -0.711401400369
+        w: 0.702785918721
+---
+
+  target_pose: 
+    header: 
+      seq: 10
+      stamp: 
+        secs: 1512037418
+        nsecs:   8732300
+      frame_id: map
+    pose: 
+      position: 
+        x: -0.428755164146
+        y: -1.11033499241
+        z: 0.0
+      orientation: 
+        x: 0.0
+        y: 0.0
+        z: 0.99998856758
+        w: -0.00478170558912
+---
+
+  target_pose: 
+    header: 
+      seq: 11
+      stamp: 
+        secs: 1512037426
+        nsecs:  93648361
+      frame_id: map
+    pose: 
+      position: 
+        x: 0.352906405926
+        y: -1.06807863712
+        z: 0.0
+      orientation: 
+        x: 0.0
+        y: 0.0
+        z: 0.013401124585
+        w: 0.999910200898
+---
+
+  target_pose: 
+    header: 
+      seq: 12
+      stamp: 
+        secs: 1512037432
+        nsecs: 548287135
+      frame_id: map
+    pose: 
+      position: 
+        x: 0.449260354042
+        y: -1.08679580688
+        z: 0.0
+      orientation: 
+        x: 0.0
+        y: 0.0
+        z: 0.999998656856
+        w: -0.00163898955165
+---
+
+  target_pose: 
+    header: 
+      seq: 13
+      stamp: 
+        secs: 1512037438
+        nsecs: 407063353
+      frame_id: map
+    pose: 
+      position: 
+        x: 1.34238398075
+        y: -1.0309009552
+        z: 0.0
+      orientation: 
+        x: 0.0
+        y: 0.0
+        z: -0.0175797638454
+        w: 0.999845464011
+---
+
+
