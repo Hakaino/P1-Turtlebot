@@ -1,0 +1,10 @@
+How to launch the turtlebot
+
+Make sure that you have COPIED the map files to the tmp folder (found under computer in the)
+
+roslaunch turtlebot_bringup minimal.launch
+
+roslaunch turtlebot_navigation amcl_demo.launch map_file:=/tmp/map_warehouse_revised2.yaml
+
+roslaunch turtlebot_rviz_launchers view_navigation.launch --screen
+
