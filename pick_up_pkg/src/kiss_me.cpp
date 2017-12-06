@@ -16,7 +16,7 @@ struct position{
   float z_ori;
 } current_position;
 //the distance we want the robot to go backwards. Here 15 centimeters
-const float distance_backwards=0.18;
+const float distance_backwards=0.20;
 //Function declaration. It makes the robot drive with a certain speed.
 void driver(float speed);
 //Function declaration for the bumper callback
@@ -59,6 +59,8 @@ int main(int argc, char *argv[]) {
 }
 
 void start_kiss(){
+  check_bumper = true;
+
   while (check_bumper) {
     //a call for the driver function with the speed 0.1
     driver(0.1);
@@ -85,7 +87,6 @@ void start_kiss(){
     std::cout << distance << std::endl;
     ros::spinOnce();
   }
-  check_bumper = true;
 }
 
   //the odom callback sets the position taken from the Odometry
