@@ -65,8 +65,7 @@ int main(int argc, char** argv) {
         ac.waitForResult(); //wait until the turtlebot return either sucess or fail
 
 
-        failAmount +=
-        handle_goalReached(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED);
+        failAmount += handle_goalReached(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED);
 
         ros::spinOnce();
     }
@@ -136,7 +135,6 @@ int handle_goalReached(bool IsSucess){
         while (kiss_complete == -1) { // Wait for the kiss to complete
             ROS_INFO("waiting!");
             ros::spinOnce();
-            loop_rate.sleep();
         }
         kiss_complete = -1; //reset the kiss_complete
         return 0;
