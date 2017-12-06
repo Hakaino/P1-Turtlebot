@@ -24,11 +24,20 @@ struct Coordinate {
 Coordinate shelves[AMOUNT_OF_SHELVES];
 int kiss_complete;
 
+//kiss complete. -1 for nothing recieved from kiss_me node, 1 kiss_complete, 0 for kiss_not complete
+void kiss_me_CB(std_msgs::Bool kiss_msg){
+   if(kiss_msg.data == true){
+      kiss_complete = 1;
+    } else{
+      kiss_complete = 0;
+    }
+}
+
 using namespace std;
 int main(int argc, char** argv) {
     ros::init(argc, argv, "simple_navigation_goals");
     ros::NodeHandle n;
-
+    kiss_complete = -1;
     ros::Publisher sound_pub = n.advertise<kobuki_msgs::Sound>("/mobile_base/commands/sound", 1);
 
     ros::Subscriber kiss_sub = n.subscribe<std_msgs::Bool>("/kiss_me", 100, kiss_me_CB);
@@ -64,9 +73,7 @@ int main(int argc, char** argv) {
         ac.sendGoal(goal); //Send the current goal to the move_base
         ac.waitForResult(); //wait until the turtlebot return either sucess or fail
 
-
-        failAmount +=
-        handle_goalReached(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED);
+        failAmount += handle_goalReached(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED);
 
         ros::spinOnce();
     }
@@ -79,27 +86,20 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-//kiss complete. -1 for nothing recieved from kiss_me node, 1 kiss_complete, 0 for kiss_not complete
-void kiss_me_CB(std_msgs::Bool kiss_msg){
-int kiss_complete;
-   if(kiss_msg.data == true){
-      kiss_complete = 1;
-    } else{
-      kiss_complete = 0;
-    }
-}
+
 
 std::queue<int> prompt_for_input(int* amount_of_entries){
   bool run = true;
   int input_shelf_number = -1;
   queue<int> input_queue;
-  *amount_of_entries = 0;
+  *amount_of_entries = 1;
   //The while loop that prompts for inputs from the user
   while(run) {
       cout << "Everything below 1 and above the amount of shelves will activate the queue \n"
               "what shelf do you want to go to? \n"
-              "Entry #" << *amount_of_entries++ <<": " ;
+              "Entry #" << *amount_of_entries <<": " ;
       cin >> input_shelf_number;
+      *amount_of_entries += 1;
       input_shelf_number--; //subtract one from the input number to match the index of array
 
       //if the input is below or above the number of shelves we stop the prompts
@@ -122,11 +122,11 @@ int handle_goalReached(bool IsSucess){
   ros::Publisher sound_pub = n.advertise<kobuki_msgs::Sound>("/mobile_base/commands/sound", 1);
   kobuki_msgs::Sound Soundmsgs; // a type to publish to the /mobile_base/commands/sound topic
 
+  ros::Subscriber kiss_sub = n.subscribe<std_msgs::Bool>("/kiss_me", 100, kiss_me_CB);
+
   ros::Publisher kiss_pub = n.advertise<std_msgs::Bool>("/simple_navigation_goals", 1);
   std_msgs::Bool kiss_msg;
   kiss_msg.data = true;
-
-  ros::Rate loop_rate(5);
 
   if(IsSucess){
         ROS_INFO("Sucess!");
@@ -136,7 +136,6 @@ int handle_goalReached(bool IsSucess){
         while (kiss_complete == -1) { // Wait for the kiss to complete
             ROS_INFO("waiting!");
             ros::spinOnce();
-            loop_rate.sleep();
         }
         kiss_complete = -1; //reset the kiss_complete
         return 0;
