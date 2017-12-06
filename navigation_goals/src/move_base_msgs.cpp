@@ -1,9 +1,7 @@
 #include <ros/ros.h>
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
-#include <visualization_msgs/Marker.h>
-#include <visualization_msgs/MarkerArray.h>
-#include <queue>
+#include <list>
 #include <iostream>
 #include <kobuki_msgs/Sound.h>
 #include <std_msgs/Bool.h>
@@ -11,7 +9,7 @@
 //declarations of functions
 void initialize_shelves();
 void kiss_me_CB(std_msgs::Bool kiss_msg);
-std::queue<int> prompt_for_input(int *amount_of_entries);
+std::list<int> prompt_for_input(int &amount_of_entries);
 int handle_goalReached(bool IsSucess);
 
 //A struct used to store data on both locations and rotations
@@ -24,15 +22,6 @@ struct Coordinate {
 Coordinate shelves[AMOUNT_OF_SHELVES];
 int kiss_complete;
 
-//kiss complete. -1 for nothing recieved from kiss_me node, 1 kiss_complete, 0 for kiss_not complete
-void kiss_me_CB(std_msgs::Bool kiss_msg){
-   if(kiss_msg.data == true){
-      kiss_complete = 1;
-    } else{
-      kiss_complete = 0;
-    }
-}
-
 using namespace std;
 int main(int argc, char** argv) {
     ros::init(argc, argv, "simple_navigation_goals");
@@ -43,19 +32,19 @@ int main(int argc, char** argv) {
     ros::Subscriber kiss_sub = n.subscribe<std_msgs::Bool>("/kiss_me", 100, kiss_me_CB);
     ros::Publisher kiss_pub = n.advertise<std_msgs::Bool>("/simple_navigation_goals", 1);
 
-    initialize_shelves();
     //tell the action client that we want to spin a thread by default
     actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> ac("move_base", true);
 
-    while(!ac.waitForServer(ros::Duration(5.0))) {
+    initialize_shelves();
+
+    while( !ac.waitForServer(ros::Duration(1.0)) ) {
         ROS_INFO("Waiting for the move_base action server to come up");
     }
-
 
     int Entries = 0; // an int holding the total amount of goals sent
     int failAmount = 0; //an int holding the amount of fails
 
-    queue<int> input_queue = prompt_for_input(&Entries);
+    list<int> input_queue = prompt_for_input(Entries);
 
     //A for loop that iterates through the different shelfs that was input by the user
     while( !input_queue.empty() ){ //While the queue is not empty
@@ -66,7 +55,7 @@ int main(int argc, char** argv) {
         goal.target_pose.pose.position.y = shelves[input_queue.front()].y;
         goal.target_pose.pose.orientation.w = shelves[input_queue.front()].rotW;
         goal.target_pose.pose.orientation.z = shelves[input_queue.front()].rotZ;
-        input_queue.pop();
+        input_queue.pop_front();
 
         ROS_INFO("Sending goal");
 
@@ -86,20 +75,27 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+//kiss complete. -1 for nothing recieved from kiss_me node, 1 kiss_complete, 0 for kiss_not complete
+void kiss_me_CB(std_msgs::Bool kiss_msg){
+   if(kiss_msg.data == true){
+      kiss_complete = 1;
+    } else{
+      kiss_complete = 0;
+    }
+}
 
-
-std::queue<int> prompt_for_input(int* amount_of_entries){
+std::list<int> prompt_for_input(int &amount_of_entries){
   bool run = true;
   int input_shelf_number = -1;
-  queue<int> input_queue;
-  *amount_of_entries = 1;
+  list<int> input_queue;
+  amount_of_entries = 1;
   //The while loop that prompts for inputs from the user
   while(run) {
       cout << "Everything below 1 and above the amount of shelves will activate the queue \n"
               "what shelf do you want to go to? \n"
-              "Entry #" << *amount_of_entries <<": " ;
+              "Entry #" << amount_of_entries <<": " ;
       cin >> input_shelf_number;
-      *amount_of_entries += 1;
+      amount_of_entries += 1;
       input_shelf_number--; //subtract one from the input number to match the index of array
 
       //if the input is below or above the number of shelves we stop the prompts
@@ -107,7 +103,7 @@ std::queue<int> prompt_for_input(int* amount_of_entries){
           run = false;
       } else
       {// Else we put the user input into an array called "input_list"
-          input_queue.push(input_shelf_number);
+          input_queue.push_back(input_shelf_number);
       }
   }
   return input_queue;
@@ -156,12 +152,10 @@ void initialize_shelves() { // initialize the shelfes from the map
     shelves[i].y = 0.375935912132 - add;
     shelves[i].rotZ = 0.713531741909;
     shelves[i++].rotW = 0.700622903771;
-
     shelves[i].x = 0.990336298943;
     shelves[i].y = 0.381471037865 - add;
     shelves[i].rotZ = 0.713531741909;
     shelves[i++].rotW = 0.700622903771;
-
 
     shelves[i].x = 0.00168535113335;
     shelves[i].y = -2.46735405922 + add;

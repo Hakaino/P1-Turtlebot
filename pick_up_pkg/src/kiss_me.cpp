@@ -49,11 +49,12 @@ int main(int argc, char *argv[]) {
   //Subscriber for the odometry
   ros::Subscriber o_sub= nh.subscribe("/odom", 1000, odomCallback);
 
-  ros::Subscriber navi_sub = nh.subscribe("/simple_navigation_goals", 1000, Navi_goals_CB);
+  ros::Subscriber navi_sub = nh.subscribe("/simple_navigation_goals", 1, Navi_goals_CB);
   ros::Publisher Complete_pub = nh.advertise<std_msgs::Bool>("/kiss_me",1);
   //this while loop runs until the boolean variable changes to false
   //(see bumperCallback function)
   //The program does not run any further until check_bumper changes to false.
+  ROS_INFO("Ready to kiss!");
   ros::spin();
   return 0;
 }
