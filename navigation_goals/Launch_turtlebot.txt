@@ -8,3 +8,5 @@ roslaunch turtlebot_navigation amcl_demo.launch map_file:=/tmp/map_warehouse_rev
 
 roslaunch turtlebot_rviz_launchers view_navigation.launch --screen
 
+To run the actual nodes(remember to source):
+roslaunc navigation_goals warehouse_launch
