@@ -39,10 +39,14 @@ int main(int argc, char** argv) {
     ros::init(argc, argv, "simple_navigation_goals");
     ros::NodeHandle n;
 
+
+  geometry_msgs::PoseStamped NewTemp;
+  
+
     ros::Publisher sound_pub = n.advertise<kobuki_msgs::Sound>("/mobile_base/commands/sound", 1);
     ros::Subscriber kiss_sub = n.subscribe<std_msgs::Bool>("/kiss_me", 100, kiss_me_CB);
     ros::Publisher kiss_pub = n.advertise<std_msgs::Bool>("/simple_navigation_goals", 1);
-
+    
     //A service client that can get a plan from the move_base/make_plan service
     ros::ServiceClient MakePlanClient = n.serviceClient<nav_msgs::GetPlan>("/move_base/make_plan",true);
 
@@ -63,7 +67,7 @@ int main(int argc, char** argv) {
     list<int> input_list = prompt_for_input(Entries); // get input from the user
     SortList(input_list); //sorts the list numerically
     list<int> FailedList;
-
+    
     //A for loop that iterates through the different shelfs that was input by the user
     while( !input_list.empty() ){ //While the queue is not empty
 
@@ -81,11 +85,11 @@ int main(int argc, char** argv) {
         FailedList.push_front(closest);
       }
       input_list.remove(closest);// remove the shelf we just visited from the list
-
+      
       //spin to update Everything
       ros::spinOnce();
     }
-
+    
     SortList(FailedList);//Sort the failedlist
 
     //We run one more time, with the failed attempts.
@@ -147,6 +151,7 @@ std::list<int> prompt_for_input(int &amount_of_entries){
           input_queue.push_back(input_shelf_number);
       }
   }
+  
   return input_queue;
 }
 
@@ -230,7 +235,6 @@ int find_closest_goal(ros::ServiceClient &MakePlanClient,
         //Create a new msgs of the type required for move_base/make_plan
         nav_msgs::GetPlan ServerMsg;
         //input the data into the msgs that should be sent to the service
-        move_base_msgs::MoveBaseGoal goal;
         ServerMsg.request.goal.header.frame_id = "map";
         ServerMsg.request.goal.header.stamp = ros::Time::now();
         ServerMsg.request.goal.pose.position.x = shelves[i].x;
