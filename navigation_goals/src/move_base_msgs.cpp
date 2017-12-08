@@ -242,6 +242,10 @@ int find_closest_goal(ros::ServiceClient &MakePlanClient,
         Call_makePlan_service(MakePlanClient, ServerMsg);
         //find the lenght to the newly found plan.
         float tmpPathLenght = find_lenght_of_path(ServerMsg);
+
+        if(tmpPathLenght < 0.001){ //if we get a zero lenght path we want to consider it the longest possible
+          tmpPathLenght = 10.00;
+        }
         ROS_INFO("Checking position %d with the lenght of %f", i+1, tmpPathLenght);
 
         //if the newly found path lenght is less than the previously shortestPath
