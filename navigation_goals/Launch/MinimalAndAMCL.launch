@@ -2,7 +2,10 @@
 <launch>
 
   <include file="$(find turtlebot_bringup)/launch/minimal.launch" />
-  <include file="$(find turtlebot_navigation)/launch/amcl_demo.launch" args="map_file:=/tmp/map_warehouse_revised2.yaml"/>
+
+  <include file="$(find turtlebot_navigation)/launch/amcl_demo.launch">
+    <arg name="map_file" value="/tmp/map_warehouse_revised2.yaml"/>
+  </include>
 
   <node pkg="navigation_goals" type="move_base_msgs_node" name="simple_navigation_goals_node"
   output="screen"/>
