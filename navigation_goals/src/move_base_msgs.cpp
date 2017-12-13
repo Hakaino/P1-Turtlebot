@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
     Soundmsgs.value = 0;
     //give feedback to the user before closing the program
     cout << "\nDone with that went through: " << Entries << " positions, with "
-         << failAmount << " fails \n";
+         << FailedList.size() << " fails \n";
     sound_pub.publish(Soundmsgs); // play a sound before we quit
     return 0;
 }
@@ -126,7 +126,7 @@ std::list<int> prompt_for_input(int &amount_of_entries){
               "what shelf do you want to go to? \n"
               "Entry #" << amount_of_entries <<": ";
       cin >> input_shelf_number; //get data from user and put it into input_shelf_number
-      amount_of_entries += 1; // count up the amount of entries to keep track of how many shelves we visit
+
       input_shelf_number--; //subtract one from the input number to match the index of array
 
       //if the input is below or above the number of shelves we stop the prompts
@@ -134,7 +134,8 @@ std::list<int> prompt_for_input(int &amount_of_entries){
           run = false; //will stop the while loop from looping again
       } else
       {// Else we put the user input into an array called "input_list"
-          input_queue.push_back(input_shelf_number);
+      amount_of_entries += 1; // count up the amount of entries to keep track of how many shelves we visit
+      input_queue.push_back(input_shelf_number);
       }
   }
   
@@ -210,7 +211,7 @@ int find_closest_goal(ros::ServiceClient &MakePlanClient,
                       std::list<int> sorted_inputList){
     int Closest_Shelf = 0; //the value that is eventually returned by the function
     int LastEntry = -1; //last entry set to -1 to ensure that it is not a shelf by default
-    float shortestPath = 5.0; //variable to hold the current shortest known path
+    float shortestPath = 100.0; //variable to hold the current shortest known path
     BOOST_FOREACH(int i, sorted_inputList){ //A loop that iterates through the list
       if(i != LastEntry){
         //Create a new msgs of the type required for move_base/make_plan
