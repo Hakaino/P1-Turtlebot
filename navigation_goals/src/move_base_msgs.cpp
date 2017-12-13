@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
     list<int> input_list = prompt_for_input(Entries); // get input from the user
     SortList(input_list); //sorts the list numerically
     list<int> FailedList;
-    
+    bool HasTriedFailedList = false; //A bool that makes sure that we only run the FailedList once
     //A for loop that iterates through the different shelfs that was input by the user
     while( !input_list.empty() ){ //While the queue is not empty
 
@@ -79,36 +79,22 @@ int main(int argc, char** argv) {
       ac.sendGoal(getGoalFromShelf(closest)); //Send the current goal to the move_base
       ac.waitForResult(); //wait until the turtlebot return either sucess or fail
 
-      bool Succeeded_goal = ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED;
+      bool GoalSuccess = ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED;
       //If we failed the goal, we want to add it to the failedlist, so we can retry it later
-      if(handle_goalReached(Succeeded_goal, sound_pub, kiss_pub,n) != 0){
+      if(handle_goalReached(GoalSuccess, sound_pub, kiss_pub,n) != 0){
         FailedList.push_front(closest);
       }
       input_list.remove(closest);// remove the shelf we just visited from the list
       
       //spin to update Everything
       ros::spinOnce();
-    }
-    
-    SortList(FailedList);//Sort the failedlist
 
-    //We run one more time, with the failed attempts.
-    while( !FailedList.empty() ){ //While the queue is not empty
-      ROS_INFO("entered fail queue - Retrying");
-      //Find the closest shelf, and put that into a variable
-      int closest = find_closest_goal(MakePlanClient , FailedList);
-
-      ROS_INFO("Sending goal, shelf # %d", closest+1);
-
-      ac.sendGoal(getGoalFromShelf(closest)); //Send the current goal to the move_base
-      ac.waitForResult(); //wait until the turtlebot return either sucess or fail
-
-      //fialAmount keeps track of the number of fails we have so far.
-      failAmount += handle_goalReached(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED, sound_pub, kiss_pub,n);
-
-      FailedList.remove(closest); // remove the shelf we just visited from the list
-
-      ros::spinOnce();
+      //an if statement that reattempts to reach any failed goals.
+      if( !HasTriedFailedList && input_list.empty() && !FailedList.empty()){
+        copy(FailedList.begin(), FailedList.end(), input_list.begin());
+        SortList(input_list);
+        HasTriedFailedList = true;
+      }
     }
 
     kobuki_msgs::Sound Soundmsgs; // a type to publish to the /mobile_base/commands/sound topic
@@ -185,17 +171,11 @@ void SortList(list<int> &input_list){
 //whether or not it was reached sucessfully or not. If it was sucessfull the
 //function return 0 if not it return 1.
 int handle_goalReached(bool IsSucess, ros::Publisher sound_pub, ros::Publisher kiss_pub, ros::NodeHandle n){
-  //ros::NodeHandle n;
   kiss_complete = -1;//reset the kiss_complete
-  //ros::Publisher sound_pub = n.advertise<kobuki_msgs::Sound>("/mobile_base/commands/sound", 1);
   kobuki_msgs::Sound Soundmsgs; // a type to publish to the /mobile_base/commands/sound topic
 
-  //ros::Subscriber kiss_sub = n.subscribe<std_msgs::Bool>("/kiss_me", 100, kiss_me_CB);
-
-  //ros::Publisher kiss_pub = n.advertise<std_msgs::Bool>("/simple_navigation_goals", 1);
   std_msgs::Bool kiss_msg;
-  kiss_msg.data = true;
-
+  ros::Rate r(10);
   if(IsSucess){
         ROS_INFO("Sucess!");
         Soundmsgs.value = 2;
@@ -204,6 +184,7 @@ int handle_goalReached(bool IsSucess, ros::Publisher sound_pub, ros::Publisher k
         while (kiss_complete == -1) { // Wait for the kiss to complete
             ROS_INFO("waiting!");
             ros::spinOnce();
+            r.sleep();
         }
         return 0;
   }
@@ -295,7 +276,7 @@ float find_lenght_of_path(nav_msgs::GetPlan msgWithPlan){
   return Total_lenght;
 }
 
-void initialize_shelves() { // initialize the shelfes from the map
+void initialize_shelves() { // initialize the shelves from the map
     int i = 0;
     float add = 0.38; //distance from the wall the goal is set
 
@@ -304,7 +285,7 @@ void initialize_shelves() { // initialize the shelfes from the map
     shelves[i].rotZ = 0.713531741909;
     shelves[i++].rotW = 0.700622903771;
     shelves[i].x = 0.990336298943;
-    shelves[i].y = 0.381471037865 - add;
+    shelves[i].y = 0.381471037865 - add-10;
     shelves[i].rotZ = 0.713531741909;
     shelves[i++].rotW = 0.700622903771;
 
