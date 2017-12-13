@@ -61,6 +61,7 @@ int main(int argc, char** argv) {
         ROS_INFO("Waiting for the move_base action server to come up");
     }
 
+    while(true){
     int Entries = 0; // an int holding the total amount of goals sent
     int failAmount = 0; //an int holding the amount of fails
 
@@ -103,6 +104,7 @@ int main(int argc, char** argv) {
     cout << "\nDone with that went through: " << Entries << " positions, with "
          << FailedList.size() << " fails \n";
     sound_pub.publish(Soundmsgs); // play a sound before we quit
+    }
     return 0;
 }
 
