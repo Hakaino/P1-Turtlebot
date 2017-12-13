@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+  <include file="$(find turtlebot_bringup)/launch/minimal.launch" />
+  <include file="$(find turtlebot_navigation)/launch/amcl_demo.launch" args="map_file:=/tmp/map_warehouse_revised2.yaml"/>
+
+  <node pkg="navigation_goals" type="move_base_msgs_node" name="simple_navigation_goals_node"
+  output="screen"/>
+
+  <node pkg="pick_up_pkg" type="kiss_me" name="kiss_me"
+  output="screen"/>
+
+</launch>

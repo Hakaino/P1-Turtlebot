@@ -1,0 +1,10 @@
+<launch>
+
+  <node pkg="turtlebot_navigation" type="amcl_demo.launch" name
+  <node pkg="navigation_goals" type="move_base_msgs_node" name="simple_navigation_goals_node"
+  output="screen"/>
+
+  <node pkg="pick_up_pkg" type="kiss_me" name="kiss_me"
+  output="screen"/>
+
+</launch>

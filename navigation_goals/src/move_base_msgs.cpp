@@ -285,7 +285,7 @@ void initialize_shelves() { // initialize the shelves from the map
     shelves[i].rotZ = 0.713531741909;
     shelves[i++].rotW = 0.700622903771;
     shelves[i].x = 0.990336298943;
-    shelves[i].y = 0.381471037865 - add-10;
+    shelves[i].y = (0.381471037865 - add) -0.1;
     shelves[i].rotZ = 0.713531741909;
     shelves[i++].rotW = 0.700622903771;
 
