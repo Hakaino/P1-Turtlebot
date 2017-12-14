@@ -4,7 +4,7 @@
   <include file="$(find turtlebot_bringup)/launch/minimal.launch"/>
 
   <include file="$(find turtlebot_navigation)/launch/amcl_demo.launch">
-    <arg name="map_file" value="/tmp/map_warehouse_revised2.yaml"/>
+    <arg name="map_file" value="$(find turtlebot_navigation)/Maps/map_warehouse_revised2.yaml"/>
   </include>
 
 
