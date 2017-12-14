@@ -61,49 +61,50 @@ int main(int argc, char** argv) {
         ROS_INFO("Waiting for the move_base action server to come up");
     }
 
-    while(true){
-    int Entries = 0; // an int holding the total amount of goals sent
-    int failAmount = 0; //an int holding the amount of fails
+    while(ros::ok()){
+      int Entries = 0; // an int holding the total amount of goals sent
+      int failAmount = 0; //an int holding the amount of fails
 
-    list<int> input_list = prompt_for_input(Entries); // get input from the user
-    SortList(input_list); //sorts the list numerically
-    list<int> FailedList;
-    bool HasTriedFailedList = false; //A bool that makes sure that we only run the FailedList once
-    //A for loop that iterates through the different shelfs that was input by the user
-    while( !input_list.empty() ){ //While the queue is not empty
+      list<int> input_list = prompt_for_input(Entries); // get input from the user
+      SortList(input_list); //sorts the list numerically
+      list<int> FailedList;
+      bool HasTriedFailedList = false; //A bool that makes sure that we only run the FailedList once
+      //A for loop that iterates through the different shelfs that was input by the user
+      while( !input_list.empty() ){ //While the queue is not empty
 
-      //Find the closest shelf, and put that into a variable
-      int closest = find_closest_goal(MakePlanClient , input_list);
+        //Find the closest shelf, and put that into a variable
+        int closest = find_closest_goal(MakePlanClient , input_list);
 
-      ROS_INFO("Sending goal, shelf # %d", closest+1);
+        ROS_INFO("Sending goal, shelf # %d", closest+1);
 
-      ac.sendGoal(getGoalFromShelf(closest)); //Send the current goal to the move_base
-      ac.waitForResult(); //wait until the turtlebot return either sucess or fail
+        ac.sendGoal(getGoalFromShelf(closest)); //Send the current goal to the move_base
+        ac.waitForResult(); //wait until the turtlebot return either sucess or fail
 
-      bool GoalSuccess = ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED;
-      //If we failed the goal, we want to add it to the failedlist, so we can retry it later
-      if(handle_goalReached(GoalSuccess, sound_pub, kiss_pub,n) != 0){
-        FailedList.push_front(closest);
+        bool GoalSuccess = ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED;
+        //If we failed the goal, we want to add it to the failedlist, so we can retry it later
+        if(handle_goalReached(GoalSuccess, sound_pub, kiss_pub,n) != 0){
+          FailedList.push_front(closest);
+        }
+        input_list.remove(closest);// remove the shelf we just visited from the list
+        
+        //spin to update Everything
+        ros::spinOnce();
+
+        //an if statement that reattempts to reach any failed goals.
+        if( !HasTriedFailedList && input_list.empty() && !FailedList.empty()){
+          copy(FailedList.begin(), FailedList.end(), input_list.begin());
+          SortList(input_list);
+          HasTriedFailedList = true;
+          ROS_INFO("INto failed");
+        }
       }
-      input_list.remove(closest);// remove the shelf we just visited from the list
-      
-      //spin to update Everything
-      ros::spinOnce();
 
-      //an if statement that reattempts to reach any failed goals.
-      if( !HasTriedFailedList && input_list.empty() && !FailedList.empty()){
-        copy(FailedList.begin(), FailedList.end(), input_list.begin());
-        SortList(input_list);
-        HasTriedFailedList = true;
-      }
-    }
-
-    kobuki_msgs::Sound Soundmsgs; // a type to publish to the /mobile_base/commands/sound topic
-    Soundmsgs.value = 0;
-    //give feedback to the user before closing the program
-    cout << "\nDone with that went through: " << Entries << " positions, with "
-         << FailedList.size() << " fails \n";
-    sound_pub.publish(Soundmsgs); // play a sound before we quit
+      kobuki_msgs::Sound Soundmsgs; // a type to publish to the /mobile_base/commands/sound topic
+      Soundmsgs.value = 0;
+      //give feedback to the user before closing the program
+      cout << "\nDone with that went through: " << Entries << " positions, with "
+          << FailedList.size() << " fails \n";
+      sound_pub.publish(Soundmsgs); // play a sound before we quit
     }
     return 0;
 }
@@ -121,12 +122,12 @@ std::list<int> prompt_for_input(int &amount_of_entries){
   bool run = true;
   int input_shelf_number = -1;
   list<int> input_queue;
-  amount_of_entries = 1;
+  amount_of_entries = 0;
   //The while loop that prompts for inputs from the user
   while(run) {
       cout << "Everything below 1 and above the amount of shelves will activate the queue \n"
               "what shelf do you want to go to? \n"
-              "Entry #" << amount_of_entries <<": ";
+              "Entry #" << amount_of_entries+1 <<": ";
       cin >> input_shelf_number; //get data from user and put it into input_shelf_number
 
       input_shelf_number--; //subtract one from the input number to match the index of array
@@ -136,7 +137,7 @@ std::list<int> prompt_for_input(int &amount_of_entries){
           run = false; //will stop the while loop from looping again
       } else
       {// Else we put the user input into an array called "input_list"
-      amount_of_entries += 1; // count up the amount of entries to keep track of how many shelves we visit
+      amount_of_entries++; // count up the amount of entries to keep track of how many shelves we visit
       input_queue.push_back(input_shelf_number);
       }
   }
