@@ -31,6 +31,7 @@ struct Coordinate {
 
 //definitions and global variables
 #define AMOUNT_OF_SHELVES 8
+#define NUMBER_OF_RETRIES 1
 Coordinate shelves[AMOUNT_OF_SHELVES];
 int kiss_complete;
 
@@ -68,7 +69,7 @@ int main(int argc, char** argv) {
       list<int> input_list = prompt_for_input(Entries); // get input from the user
       SortList(input_list); //sorts the list numerically
       list<int> FailedList;
-      bool HasTriedFailedList = false; //A bool that makes sure that we only run the FailedList once
+      int HasTriedFailedList = 0; //A int that makes sure that we only run the FailedList once
       //A for loop that iterates through the different shelfs that was input by the user
       while( !input_list.empty() ){ //While the queue is not empty
 
@@ -91,11 +92,15 @@ int main(int argc, char** argv) {
         ros::spinOnce();
 
         //an if statement that reattempts to reach any failed goals.
-        if( !HasTriedFailedList && input_list.empty() && !FailedList.empty()){
-          copy(FailedList.begin(), FailedList.end(), input_list.begin());
+        if( (HasTriedFailedList < NUMBER_OF_RETRIES) && input_list.empty() && !FailedList.empty()){
+          BOOST_FOREACH(int i, FailedList){
+            input_list.push_back(i);
+          }
           SortList(input_list);
-          HasTriedFailedList = true;
-          ROS_INFO("INto failed");
+          HasTriedFailedList++;
+          ROS_INFO("Trying the failed list number of retries: %d", HasTriedFailedList);
+
+          FailedList.clear();
         }
       }
 
