@@ -2,7 +2,7 @@
 <launch>
 
   <include file="$(find turtlebot_bringup)/launch/minimal.launch">
-    <param name="max_vel_x" value="0.15" />
+    <param> name="max_vel_x" value="0.15" </param>
   </include>
 
   <include file="$(find turtlebot_navigation)/launch/amcl_demo.launch">
