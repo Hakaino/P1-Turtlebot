@@ -130,23 +130,23 @@ std::list<int> prompt_for_input(int &amount_of_entries){
   amount_of_entries = 0;
   //The while loop that prompts for inputs from the user
   while(run) {
-      cout << "Everything below 1 and above the amount of shelves will activate the queue \n"
+      cout << "Everything below 1 and above the" 
+              "amount of shelves will activate the queue \n"
               "what shelf do you want to go to? \n"
               "Entry #" << amount_of_entries+1 <<": ";
-      cin >> input_shelf_number; //get data from user and put it into input_shelf_number
-
-      input_shelf_number--; //subtract one from the input number to match the index of array
-
+      //get data from user and put it into input_shelf_number
+      cin >> input_shelf_number;
+      //subtract one from the input number to match the index of array
+      input_shelf_number--; 
       //if the input is below or above the number of shelves we stop the prompts
       if(input_shelf_number < 0 || input_shelf_number+1 > AMOUNT_OF_SHELVES) {
           run = false; //will stop the while loop from looping again
-      } else
-      {// Else we put the user input into an array called "input_list"
-      amount_of_entries++; // count up the amount of entries to keep track of how many shelves we visit
+      } else{// Else we put the user input into an array called "input_list"
+      // count up the amount of entries to keep track of how many shelves we visit
+      amount_of_entries++; 
       input_queue.push_back(input_shelf_number);
       }
   }
-  
   return input_queue;
 }
 
@@ -179,9 +179,11 @@ void SortList(list<int> &input_list){
 //function to handle the actions taken when the turtlebot reaches its goal
 //whether or not it was reached sucessfully or not. If it was sucessfull the
 //function return 0 if not it return 1.
-int handle_goalReached(bool IsSucess, ros::Publisher sound_pub, ros::Publisher kiss_pub, ros::NodeHandle n){
+int handle_goalReached(bool IsSucess, ros::Publisher sound_pub,
+                    ros::Publisher kiss_pub, ros::NodeHandle n){
   kiss_complete = -1;//reset the kiss_complete
-  kobuki_msgs::Sound Soundmsgs; // a type to publish to the /mobile_base/commands/sound topic
+  // a type to publish to the /mobile_base/commands/sound topic
+  kobuki_msgs::Sound Soundmsgs; 
 
   std_msgs::Bool kiss_msg;
   ros::Rate r(10);
@@ -206,7 +208,8 @@ int handle_goalReached(bool IsSucess, ros::Publisher sound_pub, ros::Publisher k
 }
 
 //The function that calls the service and updates the path in the service_msg
-bool Call_makePlan_service(ros::ServiceClient &MakePlanClient, nav_msgs::GetPlan &Service_msg){
+bool Call_makePlan_service(ros::ServiceClient &MakePlanClient, 
+                           nav_msgs::GetPlan &Service_msg){
     if(MakePlanClient.call(Service_msg)){
       return true; //return true if it was SUCCEEDED
     }else {
@@ -236,8 +239,8 @@ int find_closest_goal(ros::ServiceClient &MakePlanClient,
         Call_makePlan_service(MakePlanClient, ServerMsg);
         //find the lenght to the newly found plan.
         float tmpPathLenght = find_lenght_of_path(ServerMsg);
-
-        if(tmpPathLenght < 0.001){ //if we get a zero lenght path we want to consider it the longest possible
+        //if we get a zero lenght path we want to consider it the longest possible
+        if(tmpPathLenght < 0.001){ 
           tmpPathLenght = 10.00;
         }
         ROS_INFO("Checking position %d with the lenght of %f", i+1, tmpPathLenght);
