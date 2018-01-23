@@ -21,7 +21,7 @@ struct position{
 //the distance we want the robot to go backwards. Here 15 centimeters
 const float distance_backwards=0.10;
 const float distance_first_back=0.05;
-#define PI 3.14;
+#define PI 3.05;
 //Function declaration. It makes the robot drive with a certain speed.
 void driver(float speed, float angular);
 //Function declaration for the bumper callback
@@ -61,6 +61,7 @@ int main(int argc, char *argv[]) {
   //this while loop runs until the boolean variable changes to false
   //(see bumperCallback function)
   //The program does not run any further until check_bumper changes to false.
+  start_kiss();
   ROS_INFO("Ready to kiss!");
   ros::spin();
   return 0;
@@ -102,21 +103,27 @@ void start_kiss(){
   float angle_to_go=yaw;
   if(angle_to_go>0){
     angle_to_go-=PI;
-    std::cout << "Turning clockwise" << std::endl;
+    std::cout << "angle "<< angle_to_go <<std::endl;
+    std::cout << "Turning clockwise(less than)" <<std::endl;
     while(angle_to_go<yaw ){
+std::cout << "yaw "<< yaw <<std::endl;
       yaw=yaw_rotation(current_position);
-      driver(0,-0.3);
+      driver(0,-0.5);
       ros::spinOnce();
     }
+      driver(0, 0.1);
   }
   else {
     angle_to_go+=PI;
-    std::cout << "Turning counter clockwise" << std::endl;
+    std::cout << "angle" << angle_to_go <<std::endl;
+    std::cout << "Turning counter clockwise(Greatern than)" << std::endl;
     while(angle_to_go>yaw ){
+      std::cout << "yaw "<< yaw <<std::endl;
       yaw=yaw_rotation(current_position);
-      driver(0,0.3);
+      driver(0,0.5);
       ros::spinOnce();
     }
+    driver(0, -0.1);
   }
 
   position turned_position=current_position;
