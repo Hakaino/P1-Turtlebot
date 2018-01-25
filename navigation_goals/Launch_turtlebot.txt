@@ -13,3 +13,20 @@ roslaunch turtlebot_navigation amcl_demo.launch map_file:=/tmp/map_warehouse_rev
 ******On your own PC's terminal ***************
 To run the actual nodes(remember to source):
 roslaunch navigation_goals warehouse_launch
+
+
+
+How to launch the turtlebot_250118
+
+Make sure that you have COPIED the map files to the tmp folder (found under computer in the)
+
+roslaunch turtlebot_bringup minimal.launch
+
+roslaunch turtlebot_navigation amcl_demo.launch map_file:=/tmp/map_warehouse_revised2.yaml
+
+roslaunch turtlebot_rviz_launchers view_navigation.launch --screen
+
+roslaunch navigation_goals warehouse_Our_Nodes.launch
+
+To run the actual nodes(remember to source):
+roslaunch navigation_goals warehouse_launch
